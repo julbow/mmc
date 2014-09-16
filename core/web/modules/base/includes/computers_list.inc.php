@@ -33,6 +33,7 @@ function list_computers($names, $filter, $count = 0, $delete_computer = false, $
     $mscAction = new ActionItem(_("Software deployment"),"msctabs","install","computer", "base", "computers");
     $imgAction = new ActionItem(_("Imaging management"),"imgtabs","imaging","computer", "base", "computers");
     $downloadFileAction = new ActionItem(_("Download file"), "download_file", "download", "computer", "base", "computers");
+    $ideskAction = new ActionItem(_("iDesk issue"), "ideskcreate", "idesk", "computer", "base", "computers");
     $vncClientAction = new ActionPopupItem(_("Remote control"), "vnc_client", "vncclient", "computer", "base", "computers");
     $profileAction = new ActionItem(_("Show Profile"), "computersgroupedit", "logfile","computer", "base", "computers"); 
 
@@ -42,6 +43,7 @@ function list_computers($names, $filter, $count = 0, $delete_computer = false, $
     $actionImaging = array();
     $actionDownload = array();
     $actionVncClient = array();
+    $actionIDesk = array();
     $actionProfile = array();
     $params = array();
     $cssClasses = array();
@@ -89,7 +91,11 @@ function list_computers($names, $filter, $count = 0, $delete_computer = false, $
         }
         if (in_array("imaging", $_SESSION["supportModList"])) {
             $actionImaging[] = $imgAction;
-        }
+	}
+	
+	if (in_array("idesk", $_SESSION["supportModList"])) {
+	    $actionIDesk[] = $ideskAction;
+	}
         /*
         if (in_array("dyngroup", $_SESSION["modulesList"])) {
             $profile = $h_profiles[$value['objectUUID']];
@@ -159,7 +165,9 @@ function list_computers($names, $filter, $count = 0, $delete_computer = false, $
     if ($msc_can_download_file) {
         $n->addActionItemArray($actionDownload);
     };
-
+    if (in_array("idesk", $_SESSION["supportModList"])) {
+        $n->addActionItemArray($actionIDesk);
+    }
     if (in_array("backuppc", $_SESSION["supportModList"]))
         $n->addActionItem(new ActionItem(_("Backup status"),"hostStatus","backuppc","backuppc", "backuppc", "backuppc"));
 

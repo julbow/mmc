@@ -29,6 +29,9 @@ require("localSidebar.php");
 require("graph/navbar.inc.php");
 require("modules/base/includes/AjaxFilterLog.inc.php");
 require_once("includes/FormHandler.php");
+if (in_array("idesk", $_SESSION["supportModList"])) {
+    require_once("modules/idesk/includes/menu_action.php");
+}
 
 # infos messages
 global $result;
