@@ -366,6 +366,18 @@ class Inventory(DyngroupDatabaseHelper):
         query = query.group_by(self.machine.c.id)
         return query
 
+    def getUUIDByMachineName(self, ctx, name):
+
+        session = create_session()
+        query = session.query(Machine).filter(self.machine.c.Name==name)
+        result = query.all()
+        if len(result)==1:
+            return toUUID(result[0].id)
+        else:
+            return None
+
+        session.close()
+
     def getTotalComputerCount(self):
         session = create_session()
         c = session.query(Machine).count()
@@ -957,6 +969,17 @@ class Inventory(DyngroupDatabaseHelper):
     def doesUserHaveAccessToMachines(self, userid, machine_uuid, all = True): # TODO implement ...
         return True
 
+    def getMachineByLastLoggedUser(self, ctx, user):
+        result = self.getLastMachineInventoryPart(ctx, "Hardware", {"User": user})
+        if len(result) > 0:
+            uuid = result[0][2]
+            computers = self.getComputersOptimized(ctx, {"uuid" :uuid})
+            if len(computers)==1:
+                return computers[uuid][1]
+            #return result[0][1][0] #[q[0] for q in result][0]
+        return None
+
+
     def countLastMachineInventoryPart(self, ctx, part, params):
         session = create_session()
         result, grp_by = self.__lastMachineInventoryPartQuery(session, ctx, part, params)
@@ -1231,6 +1254,8 @@ class Inventory(DyngroupDatabaseHelper):
         #result = result.filter(self.table['hasEntity'].c.entity.in_(ctx.locationsid))
         # Apply other filters
         result = self.__filterQuery(part, ctx, result, params)
+        if "User" in params:
+            result = result.filter(self.klass['Hardware'].User == params["User"])
 
         # Apply a filter on the software ProductName if asked in parameters (the filter is loaded from a config file)
         if params.has_key('software_filter') and params['software_filter'] == True and part == 'Software':
