@@ -75,6 +75,14 @@ function canAddComputer() {
     return xmlCall("base.canAddComputer");    
 }
 
+function canChangeOwnerOfComputer() {
+    return xmlCall("base.canChangeOwnerOfComputer");    
+}
+
+function changeOwnerOfComputer($uuid, $user) {
+    return xmlCall("base.changeOwnerOfComputer", array($uuid, $user));    
+}
+
 function canDelComputer() {
     if (!isset($_SESSION["canDelComputer"])) {
         $_SESSION["canDelComputer"] = xmlCall("base.canDelComputer", null);

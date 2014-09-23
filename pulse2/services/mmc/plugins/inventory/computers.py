@@ -186,6 +186,15 @@ class InventoryComputers(ComputerI):
     def canAddComputer(self):
         return self.inventory.canAddMachine()
 
+    def canChangeOwnerOfComputer(self):
+        return self.config.can_change_owner
+
+    def changeOwnerOfComputer(self, uuid, user):
+        self.inventory.update_owner(uuid, user)
+
+
+
+
     def canAssociateComputer2Location(self):
         return True
 

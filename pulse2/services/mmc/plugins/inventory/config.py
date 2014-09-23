@@ -33,6 +33,8 @@ class InventoryConfig(InventoryDatabaseConfig):
     graph = {}
     software_filter = []
 
+    can_change_owner = False
+
     def init(self, name = 'inventory', conffile = None):
         self.dbsection = "inventory"
         self.name = name
@@ -44,6 +46,10 @@ class InventoryConfig(InventoryDatabaseConfig):
 
     def setup(self, conf_file):
         self.disable = self.cp.getboolean("main", "disable")
+
+        if self.cp.has_option('computers', 'can_change_owner'):
+            self.can_change_owner = self.cp.getboolean('computers', 'can_change_owner')
+
         for i in getInventoryParts():
             try:
                 self.graph[i] = self.cp.get("graph", i).split('|')

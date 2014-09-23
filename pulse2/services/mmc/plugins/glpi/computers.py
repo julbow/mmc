@@ -238,6 +238,12 @@ class GlpiComputers(ComputerI):
         self.logger.warning("addComputer has not yet been implemented for glpi")
         return False
 
+    def canChangeOwnerOfComputer(self):
+        return False
+
+    def changeOwnerOfComputer(self, uuid, user):
+        pass
+
     def canDelComputer(self):
         return True
 

@@ -38,6 +38,13 @@ class ComputerI:
         """
         pass
 
+    def canChangeOwnerOfComputer(self):
+        pass
+
+    def changeOwnerOfComputer(self, uuid, user):
+        pass
+
+
     def canAssociateComputer2Location(self):
         """
         Does this module handle association between computers and locations
@@ -232,6 +239,15 @@ class ComputerManager(Singleton):
     def canDelComputer(self):
         klass = self.components[self.main]
         return klass().canDelComputer()
+
+    def canChangeOwnerOfComputer(self):
+        klass = self.components[self.main]
+        return klass().canChangeOwnerOfComputer()
+
+    def changeOwnerOfComputer(self, uuid, user):
+        klass = self.components[self.main]
+        return klass().changeOwnerOfComputer(uuid, user)
+
 
     def canAssociateComputer2Location(self):
         klass = self.components[self.main]

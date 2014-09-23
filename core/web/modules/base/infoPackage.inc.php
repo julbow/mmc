@@ -294,6 +294,12 @@ if (hasComputerManagerWorking()) {
                    array("noHeader"=>True,"visible"=>False));
     $submod->addPage($page);
 
+    $page = new Page("editowner",_("Edit owner of computer"));
+    $page->setFile("modules/base/computers/edit_owner.php",
+                   array("noHeader"=>True,"visible"=>False));
+    $submod->addPage($page);
+
+
     $page = new Page("ajaxComputersList", _("Ajax part of computers list"));
     $page->setFile("modules/base/computers/ajaxComputersList.php");
     $page->setOptions(array("visible"=>False, "AJAX" =>True));

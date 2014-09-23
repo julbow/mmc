@@ -2500,6 +2500,12 @@ class RpcProxy(RpcProxyI):
     def canAddComputer(self):
         return ComputerManager().canAddComputer()
 
+    def canChangeOwnerOfComputer(self):
+        return ComputerManager().canChangeOwnerOfComputer()
+
+    def changeOwnerOfComputer(self, uuid, user):
+        return ComputerManager().changeOwnerOfComputer(uuid, user)
+
     def canAssociateComputer2Location(self):
         return ComputerManager().canAssociateComputer2Location()
 

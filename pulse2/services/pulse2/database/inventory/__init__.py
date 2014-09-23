@@ -2381,6 +2381,52 @@ class Inventory(DyngroupDatabaseHelper):
                         return False
         return True
 
+    def update_owner(self, machine_uuid, new_user=None):
+        """
+        Updates the owner of machine.
+
+        When a first inventory injected and field 'User' isn't empty,
+        its value will be assigned as 'Owner'.
+        If 'Owner' is already assigned, this update will not be proceed.
+
+        @param machine_uuid: uuid of Machine
+        @type machine_uuid: str
+
+        @param new_user: user manually selected
+        @type new_user: str
+        """
+        session = create_session()
+
+        machine_id = fromUUID(machine_uuid)
+
+        logging.getLogger().info("Trying to update the owner (machine UUID%s)" % (machine_id))
+
+        query = session.query(Hardware)
+        query = query.select_from(self.hardware.join(self.table['hasHardware'],
+                                                     self.table['hasHardware'].c.hardware == self.table["Hardware"].c.id))
+        query = query.filter(self.table['hasHardware'].c.machine == machine_id)
+
+
+        result = query.first()
+        if result:
+            hardware = result
+            if new_user is not None:
+
+                hardware.Owner = new_user
+                session.add(hardware)
+                session.flush()
+                logging.getLogger().info("New owner of machine UUID%s is %s" % (machine_id, new_user))
+
+            elif hardware.Owner is None and hardware.User is not None:
+
+                hardware.Owner = hardware.User
+                session.add(hardware)
+                session.flush()
+                logging.getLogger().info("Initial owner of machine UUID%s is %s" % (machine_id, hardware.User))
+
+        session.close()
+
+
 def toUUID(id): # TODO : change this method to get a value from somewhere in the db, depending on a config param
     return "UUID%s" % (str(id))
 
@@ -2741,42 +2787,11 @@ class InventoryCreator(Inventory):
 
         session.close()
         if machine_exists :
-            self.update_owner(fromUUID(machine_uuid))
+            self.update_owner(machine_uuid)
             return [True, machine_uuid]
 
         return True
 
-
-    def update_owner(self, machine_id):
-        """
-        Updates the owner of machine.
-
-        When a first inventory injected and field 'User' isn't empty,
-        its value will be assigned as 'Owner'.
-        If 'Owner' is already assigned, this update will not be proceed.
-
-        @param machine_id: id of Machine
-        @type machine_id: int
-        """
-        session = create_session()
-
-        logging.getLogger().info("Trying to update the owner (machine UUID%s)" % (machine_id))
-
-        query = session.query(Hardware)
-        query = query.select_from(self.hardware.join(self.table['hasHardware'],
-                                                     self.table['hasHardware'].c.hardware == self.table["Hardware"].c.id))
-        query = query.filter(self.table['hasHardware'].c.machine == machine_id)
-
-
-        result = query.first()
-        if result:
-            hardware = result
-            if hardware.Owner is None and hardware.User is not None:
-                hardware.Owner = hardware.User
-                session.add(hardware)
-                session.flush()
-                logging.getLogger().info("New owner of machine UUID%s is %s" % (machine_id, hardware.Owner))
-        session.close()
 
 
 

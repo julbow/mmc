@@ -34,6 +34,7 @@ function list_computers($names, $filter, $count = 0, $delete_computer = false, $
     $imgAction = new ActionItem(_("Imaging management"),"imgtabs","imaging","computer", "base", "computers");
     $downloadFileAction = new ActionItem(_("Download file"), "download_file", "download", "computer", "base", "computers");
     $ideskAction = new ActionItem(_("iDesk issue"), "ideskcreate", "idesk", "computer", "base", "computers");
+    $editownerAction = new ActionPopupItem(_("Edit owner"), "editowner", "editowner", "computer", "base", "computers");
     $vncClientAction = new ActionPopupItem(_("Remote control"), "vnc_client", "vncclient", "computer", "base", "computers");
     $profileAction = new ActionItem(_("Show Profile"), "computersgroupedit", "logfile","computer", "base", "computers"); 
 
@@ -95,7 +96,9 @@ function list_computers($names, $filter, $count = 0, $delete_computer = false, $
 	
 	if (in_array("idesk", $_SESSION["supportModList"])) {
 	    $actionIDesk[] = $ideskAction;
+	    $actionEditOwner[] = $editownerAction;
 	}
+		
         /*
         if (in_array("dyngroup", $_SESSION["modulesList"])) {
             $profile = $h_profiles[$value['objectUUID']];
@@ -167,6 +170,11 @@ function list_computers($names, $filter, $count = 0, $delete_computer = false, $
     };
     if (in_array("idesk", $_SESSION["supportModList"])) {
         $n->addActionItemArray($actionIDesk);
+    }
+
+    if (canChangeOwnerOfComputer()){
+        $n->addActionItemArray($actionEditOwner);
+	    
     }
     if (in_array("backuppc", $_SESSION["supportModList"]))
         $n->addActionItem(new ActionItem(_("Backup status"),"hostStatus","backuppc","backuppc", "backuppc", "backuppc"));
