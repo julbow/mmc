@@ -53,6 +53,9 @@ class UserTable(object):
 class UserEntitiesTable(object):
     pass
 
+class Hardware(object):
+    pass
+
 class Inventory(DyngroupDatabaseHelper):
     """
     Class to query the LRS/Pulse2 inventory database, populated by OCS inventory.
@@ -116,6 +119,11 @@ class Inventory(DyngroupDatabaseHelper):
 
         self.table['Inventory'] = self.inventory
         self.klass['Inventory'] = InventoryTable
+
+        self.table['Hardware'] = self.hardware
+        self.klass['Hardware'] = Hardware
+
+        mapper(Hardware, self.hardware)
 
         for item in self.config.getInventoryParts():
             # Declare the SQL table
@@ -1011,6 +1019,7 @@ class Inventory(DyngroupDatabaseHelper):
                 fields.append(['Computer Name', ['computer_name', 'text', hardware['Host']]])
                 fields.append(['Domain', hardware['Workgroup']])
                 fields.append(['Last Logged User', hardware['User']])
+                fields.append(['Owner', hardware['Owner']])
                 fields.append(['OS', hardware['OperatingSystem']])
                 fields.append(['Service Pack', hardware['Build']])
                 fields.append(['Windows Key', hardware['OsSerialKey']])
@@ -2732,9 +2741,43 @@ class InventoryCreator(Inventory):
 
         session.close()
         if machine_exists :
+            self.update_owner(fromUUID(machine_uuid))
             return [True, machine_uuid]
 
         return True
+
+
+    def update_owner(self, machine_id):
+        """
+        Updates the owner of machine.
+
+        When a first inventory injected and field 'User' isn't empty,
+        its value will be assigned as 'Owner'.
+        If 'Owner' is already assigned, this update will not be proceed.
+
+        @param machine_id: id of Machine
+        @type machine_id: int
+        """
+        session = create_session()
+
+        logging.getLogger().info("Trying to update the owner (machine UUID%s)" % (machine_id))
+
+        query = session.query(Hardware)
+        query = query.select_from(self.hardware.join(self.table['hasHardware'],
+                                                     self.table['hasHardware'].c.hardware == self.table["Hardware"].c.id))
+        query = query.filter(self.table['hasHardware'].c.machine == machine_id)
+
+
+        result = query.first()
+        if result:
+            hardware = result
+            if hardware.Owner is None and hardware.User is not None:
+                hardware.Owner = hardware.User
+                session.add(hardware)
+                session.flush()
+                logging.getLogger().info("New owner of machine UUID%s is %s" % (machine_id, hardware.Owner))
+        session.close()
+
 
 
 # TODO - Get this info on the PXE client side !
