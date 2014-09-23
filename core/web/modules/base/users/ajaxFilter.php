@@ -81,7 +81,9 @@ $n->addExtraInfo($mails,_("Mail"));
 $n->addExtraInfo($phones,_("Telephone"));
 
 $n->addActionItem(new ActionItem(_("Edit"),"edit","edit","user"));
-$n->addActionItem(new ActionItem(_("iDesk issue"), "ideskcreate", "idesk", "user"));
+if (in_array("idesk", $_SESSION["supportModList"])) { 
+    $n->addActionItem(new ActionItem(_("iDesk issue"), "ideskcreate", "idesk", "user"));
+}
 $n->addActionItem(new ActionItem(_("MMC rights"),"editacl","editacl","user") );
 $n->addActionItem(new ActionPopupItem(_("Delete"),"delete","delete","user") );
 $n->addActionItem(new ActionPopupItem(_("Backup"),"backup","backup","user") );
