@@ -29,12 +29,11 @@ from mmc.plugins.idesk.config import IDeskConfig
 APIVERSION = "0:1:0"
 NAME = "idesk"
 
+config = IDeskConfig(NAME)
+
 def getApiVersion(): return APIVERSION
 
-
 def activate():
-    global config
-    config = IDeskConfig(NAME)
     if config.disabled:
         logging.getLogger().warning("Plugin iDesk: disabled by configuration.")
         return False
